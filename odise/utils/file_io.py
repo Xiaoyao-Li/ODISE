@@ -49,6 +49,7 @@ class ODISEHandler(PathHandler):
         return PathManager.get_local_path(path, **kwargs)
 
     def _open(self, path, mode="r", **kwargs):
+        ic(path, mode, kwargs)
         return PathManager.open(self._get_local_path(path), mode, **kwargs)
 
 
@@ -86,6 +87,8 @@ class StableDiffusionHandler(PathHandler):
             if os.path.exists(local_path):
                 logging.getLogger(__name__).info(f"Using local model zoo: {local_path}.")
                 path = local_path
+        ic(kwargs)
+        ic(path)
         return PathManager.get_local_path(path, **kwargs)
 
     def _open(self, path, mode="r", **kwargs):

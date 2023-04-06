@@ -49,8 +49,14 @@ from odise.config import instantiate_odise
 from odise.data import get_openseg_labels
 from odise.engine.defaults import get_model_from_module
 
-nltk.download("popular", quiet=True)
-nltk.download("universal_tagset", quiet=True)
+from icecream import install
+install()
+
+nltk_path_local = '/home/puhao/.cache/nltk_data'
+
+nltk.data.path.append(nltk_path_local)
+nltk.download("popular", quiet=False, download_dir=nltk_path_local)
+nltk.download("universal_tagset", quiet=False, download_dir=nltk_path_local)
 
 # constants
 WINDOW_NAME = "ODISE demo"
@@ -167,7 +173,14 @@ class VisualizationDemo(object):
         image = torch.as_tensor(image.astype("float32").transpose(2, 0, 1))
 
         inputs = {"image": image, "height": height, "width": width}
+
+        img = image.to('cpu').numpy()
+        # np.save('demo/img_demo_seq.npy', img)
+        ic(img)
         predictions = self.model([inputs])[0]
+        
+        pred = predictions['panoptic_seg'][0].to('cpu').numpy()
+        ic(pred)
         return predictions
 
     def run_on_image(self, image):
@@ -184,6 +197,13 @@ class VisualizationDemo(object):
         visualizer = Visualizer(image, self.metadata, instance_mode=self.instance_mode)
         if "panoptic_seg" in predictions:
             panoptic_seg, segments_info = predictions["panoptic_seg"]
+            # panoptic_seg = panoptic_seg.to('cpu').numpy()
+            # for panoptic_label in np.unique(panoptic_seg):
+            #     label_seg = (panoptic_seg == panoptic_label)
+
+            #     import matplotlib.pyplot as plt
+            #     plt.imshow(label_seg, cmap='binary', interpolation=None)
+            #     plt.show()
             vis_output = visualizer.draw_panoptic_seg(
                 panoptic_seg.to(self.cpu_device), segments_info
             )
@@ -382,6 +402,7 @@ if __name__ == "__main__":
     aug = instantiate(dataset_cfg.mapper).augmentations
 
     model = instantiate_odise(cfg.model)
+    ic(cfg.train.device)
     model.to(cfg.train.device)
     ODISECheckpointer(model).load(args.init_from)
     # look for the last wrapper

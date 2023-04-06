@@ -1,0 +1,55 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    // "configurations": [
+    //     {
+    //         "name": "Python: Current File",
+    //         "type": "python",
+    //         "request": "launch",
+    //         "program": "${file}",
+    //         "console": "integratedTerminal",
+    //         "justMyCode": true
+    //     }
+    // ]
+
+    // "configurations": [
+    //     {
+    //         "name": "Python: Current File",
+    //         "type": "python",
+    //         "request": "launch",
+    //         "program": "./datasets/epic_kitchen.py",
+    //         "console": "integratedTerminal",
+    //         "justMyCode": true
+    //     }
+    // ]
+
+    "configurations": [
+        {
+            "name": "Python: Current File",
+            "type": "python",
+            "request": "launch",
+            "program": "./demo/demo_seq.py",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "args": ["--label", ""]
+        }
+    ]
+
+    // "configurations": [
+    //     {
+    //         "name": "Python: Current File",
+    //         "type": "python",
+    //         "request": "launch",
+    //         "program": "./demo/demo.py",
+    //         "console": "integratedTerminal",
+    //         "justMyCode": true,
+    //         "args": ["--input", "/home/puhao/dev/MAH/DataPreprocess/ODISE/demo/EPIC-KITCHEN/P01/rgb_frames/P01_01/frame_0000000001.jpg",
+    //         "--output", "demo/frame_pred.jpg",
+    //         "--vocab", "person",
+    //         // "--label", "",
+    //     ]
+    //     }
+    // ]
+}
