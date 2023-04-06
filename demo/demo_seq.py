@@ -36,6 +36,8 @@ from odise.engine.defaults import get_model_from_module
 from datasets.epic_kitchen import EpicKitchen
 from datasets.misc import collate_fn_general
 
+from PIL import Image
+
 import yaml
 from loguru import logger
 from icecream import install
@@ -114,8 +116,7 @@ if __name__ == '__main__':
         help="extra vocabulary, in format 'a1,a2;b1,b2',"
         "where a1,a2 are synonyms vocabularies for the first class"
         "first word will be displayed as the class name",
-        default="person, child, girl, boy, woman, man, perple, children,\
-              girls, boys, women, men, lady, ladies, guys",
+        default="person, child, girl, boy, woman, man, perple, children, girls, boys, women, men, lady, ladies, guys",
     )
     parser.add_argument(
         "--label",
@@ -124,8 +125,24 @@ if __name__ == '__main__':
         nargs="+",
         default="",
     )
+    parser.add_argument(
+        "--batch_size",
+        type=int,
+        default=1,
+    )
+    parser.add_argument(
+        "--basedir",
+        default='/home/puhao/dev/MAH/DataPreprocess/ODISE/demo/EPIC-KITCHEN',
+    )
+    parser.add_argument(
+        "--part",
+        default='P01',
+    )
+    parser.add_argument(
+        "--clip",
+        default='P01_01',
+    )
     args = parser.parse_args()
-
     logger.info("Arguments Configuration: " + '\n' + yaml.dump(vars(args)))
 
     cfg = LazyConfig.load(args.config_file)
@@ -193,8 +210,9 @@ if __name__ == '__main__':
         wrapper_cfg = wrapper_cfg.model
     wrapper_cfg.model = get_model_from_module(model)
 
-    dataloader = EpicKitchen(part='P01', clip='P01_01',
-                             aug=aug).get_dataloader(batch_size=4,
+    logger.info(args.basedir, args.part, args.clip, args.batch_size)
+    dataloader = EpicKitchen(part=args.part, clip=args.clip,
+                             aug=aug).get_dataloader(batch_size=args.batch_size,
                                                      collate_fn=collate_fn_general,
                                                      num_workers=4,
                                                      pin_memory=True,
@@ -208,33 +226,17 @@ if __name__ == '__main__':
         stack.enter_context(torch.no_grad())
 
         for i_b, batch in enumerate(dataloader):
-            ic(batch[0]['out_path'])
-            img = batch[0]['image']
-            img = img.to('cpu').numpy()
-            # np.save('demo/img_demo_seq.npy', img)
-            ic(img)
-
-            st = time.time()
+            logger.info(f'Processing {i_b}/{len(dataloader)} batch')
             predictions = inference_model(batch)
-            ic(time.time() - st)
 
-            pred = predictions[0]
-            pred = pred['panoptic_seg'][0].to('cpu').numpy()
-            ic(pred)
-            # np.save('demo/demo_seq.npy', np.concatenate([img.astype('int32'), np.expand_dims(pred, axis=0)], axis=0))
+            # pred = predictions[0]
+            # pred = pred['panoptic_seg'][0].to('cpu').numpy()
+            
+            for i_instant in range(len(predictions)):
+                pred = predictions[i_instant]
+                pred = pred['panoptic_seg'][0].to('cpu').numpy() * 255
+                mask_img = Image.fromarray(pred.astype(np.uint8), mode='L')
+                # ic(batch[i_instant]['out_path'])
+                # ic(pred.shape)
+                mask_img.save(batch[i_instant]['out_path'])
 
-            for i_pred, pred in enumerate(predictions):
-                panoptic_seg, segments_info = pred['panoptic_seg']
-                panoptic_seg = panoptic_seg.to('cpu').numpy()
-                for panoptic_label in np.unique(panoptic_seg):
-                    label_seg = (panoptic_seg == panoptic_label)
-
-                    import matplotlib.pyplot as plt
-                    plt.imshow(label_seg, cmap='binary', interpolation=None)
-                    plt.title(f'i_pred: {i_pred}')
-                    plt.show()
-                    # ic()
-
-                ic(batch[i_pred])
-                
-            ic(len(predictions))

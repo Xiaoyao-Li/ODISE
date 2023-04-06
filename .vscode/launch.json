@@ -47,8 +47,8 @@
     //         "justMyCode": true,
     //         "args": ["--input", "/home/puhao/dev/MAH/DataPreprocess/ODISE/demo/EPIC-KITCHEN/P01/rgb_frames/P01_01/frame_0000000001.jpg",
     //         "--output", "demo/frame_pred.jpg",
-    //         "--vocab", "person",
-    //         // "--label", "",
+    //         "--vocab", "person, child, girl, boy, woman, man, perple, children, girls, boys, women, men, lady, ladies, guys",
+    //         "--label", "",
     //     ]
     //     }
     // ]

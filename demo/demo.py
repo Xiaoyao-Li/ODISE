@@ -176,11 +176,11 @@ class VisualizationDemo(object):
 
         img = image.to('cpu').numpy()
         # np.save('demo/img_demo_seq.npy', img)
-        ic(img)
+        # ic(img)
         predictions = self.model([inputs])[0]
         
-        pred = predictions['panoptic_seg'][0].to('cpu').numpy()
-        ic(pred)
+        # pred = predictions['panoptic_seg'][0].to('cpu').numpy()
+        # ic(pred)
         return predictions
 
     def run_on_image(self, image):
@@ -425,6 +425,7 @@ if __name__ == "__main__":
                 # use PIL, to be consistent with evaluation
                 img = utils.read_image(path, format="RGB")
                 start_time = time.time()
+                predictions, visualized_output = demo.run_on_image(img)
                 predictions, visualized_output = demo.run_on_image(img)
                 logger.info(
                     "{}: {} in {:.2f}s".format(
