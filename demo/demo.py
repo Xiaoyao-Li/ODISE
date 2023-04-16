@@ -1,5 +1,5 @@
-#!/usr/bin/env python
-#
+# -*- coding: utf-8 -*-
+
 # ------------------------------------------------------------------------------
 # Copyright (c) Facebook, Inc. and its affiliates.
 # Modified by Bowen Cheng from: https://github.com/facebookresearch/detectron2/blob/master/demo/demo.py
@@ -16,7 +16,7 @@
 #
 # Written by Jiarui Xu
 # ------------------------------------------------------------------------------
-
+print("Running demo.py")
 import argparse
 import glob
 import itertools
@@ -51,12 +51,16 @@ from odise.engine.defaults import get_model_from_module
 
 from icecream import install
 install()
-
-nltk_path_local = '/home/puhao/.cache/nltk_data'
-
-nltk.data.path.append(nltk_path_local)
-nltk.download("popular", quiet=False, download_dir=nltk_path_local)
-nltk.download("universal_tagset", quiet=False, download_dir=nltk_path_local)
+# print("Loading demo.py dependents finished")
+# if os.environ.get('SLURM') is None:
+#     nltk_path_local = '/home/lipuhao/.cache/nltk_data'
+# else:
+#     nltk_path_local = '/home/puhao/.cache/nltk_data'
+# nltk_path_local = '/home/lipuhao/.cache/nltk_data'
+# print("nltk_path_local: ", nltk_path_local)
+# nltk.data.path.append(nltk_path_local)
+# nltk.download("popular", quiet=False, download_dir=nltk_path_local)
+# nltk.download("universal_tagset", quiet=False, download_dir=nltk_path_local)
 
 # constants
 WINDOW_NAME = "ODISE demo"
@@ -94,50 +98,50 @@ LVIS_COLORS = list(
 )
 
 
-def get_nouns(caption, with_preposition):
-    if with_preposition:
-        # Taken from Su Nam Kim Paper...
-        grammar = r"""
-            NBAR:
-                {<NN.*|JJ>*<NN.*>}  # Nouns and Adjectives, terminated with Nouns
+# def get_nouns(caption, with_preposition):
+#     if with_preposition:
+#         # Taken from Su Nam Kim Paper...
+#         grammar = r"""
+#             NBAR:
+#                 {<NN.*|JJ>*<NN.*>}  # Nouns and Adjectives, terminated with Nouns
 
-            NP:
-                {<NBAR><IN><NBAR>}  # Above, connected with in/of/etc...
-                {<NBAR>} # If pattern is not found, just a single NBAR is ok
-        """
-    else:
-        # Taken from Su Nam Kim Paper...
-        grammar = r"""
-            NBAR:
-                {<NN.*|JJ>*<NN.*>}  # Nouns and Adjectives, terminated with Nouns
+#             NP:
+#                 {<NBAR><IN><NBAR>}  # Above, connected with in/of/etc...
+#                 {<NBAR>} # If pattern is not found, just a single NBAR is ok
+#         """
+#     else:
+#         # Taken from Su Nam Kim Paper...
+#         grammar = r"""
+#             NBAR:
+#                 {<NN.*|JJ>*<NN.*>}  # Nouns and Adjectives, terminated with Nouns
 
-            NP:
-                {<NBAR>} # If pattern is not found, just a single NBAR is ok
-        """
-    tokenized = nltk.word_tokenize(caption)
-    chunker = nltk.RegexpParser(grammar)
+#             NP:
+#                 {<NBAR>} # If pattern is not found, just a single NBAR is ok
+#         """
+#     tokenized = nltk.word_tokenize(caption)
+#     chunker = nltk.RegexpParser(grammar)
 
-    chunked = chunker.parse(nltk.pos_tag(tokenized))
-    continuous_chunk = []
-    current_chunk = []
+#     chunked = chunker.parse(nltk.pos_tag(tokenized))
+#     continuous_chunk = []
+#     current_chunk = []
 
-    for subtree in chunked:
-        if isinstance(subtree, nltk.Tree):
-            current_chunk.append(" ".join([token for token, pos in subtree.leaves()]))
-        elif current_chunk:
-            named_entity = " ".join(current_chunk)
-            if named_entity not in continuous_chunk:
-                continuous_chunk.append(named_entity)
-                current_chunk = []
-        else:
-            continue
+#     for subtree in chunked:
+#         if isinstance(subtree, nltk.Tree):
+#             current_chunk.append(" ".join([token for token, pos in subtree.leaves()]))
+#         elif current_chunk:
+#             named_entity = " ".join(current_chunk)
+#             if named_entity not in continuous_chunk:
+#                 continuous_chunk.append(named_entity)
+#                 current_chunk = []
+#         else:
+#             continue
 
-    if current_chunk:
-        named_entity = " ".join(current_chunk)
-        if named_entity not in continuous_chunk:
-            continuous_chunk.append(named_entity)
+#     if current_chunk:
+#         named_entity = " ".join(current_chunk)
+#         if named_entity not in continuous_chunk:
+#             continuous_chunk.append(named_entity)
 
-    return continuous_chunk
+#     return continuous_chunk
 
 
 class VisualizationDemo(object):
@@ -401,9 +405,11 @@ if __name__ == "__main__":
 
     aug = instantiate(dataset_cfg.mapper).augmentations
 
+    logger.info("Loading model from {}".format(args.init_from))
     model = instantiate_odise(cfg.model)
     ic(cfg.train.device)
     model.to(cfg.train.device)
+    
     ODISECheckpointer(model).load(args.init_from)
     # look for the last wrapper
     while "model" in wrapper_cfg:

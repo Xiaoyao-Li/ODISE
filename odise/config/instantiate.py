@@ -16,6 +16,7 @@ def instantiate_odise(cfg):
     cfg.sem_seg_head.input_shape = backbone.output_shape()
     cfg.sem_seg_head.pixel_decoder.input_shape = backbone.output_shape()
     cfg.backbone = backbone
+    print(cfg)
     model = instantiate(cfg)
 
     return model

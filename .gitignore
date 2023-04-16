@@ -3,6 +3,12 @@
 ##
 ## Get latest from https://github.com/github/gitignore/blob/main/VisualStudio.gitignore
 
+# custom rules
+demo/EPIC-KITCHEN
+demo/*.jpg
+outputs/*
+
+
 # User-specific files
 *.rsuser
 *.suo
@@ -397,8 +403,4 @@ FodyWeavers.xsd
 
 # JetBrains Rider
 *.sln.iml
-
-# custom rules
-demo/EPIC-KITCHEN
-demo/*.jpg
 

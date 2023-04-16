@@ -1,3 +1,4 @@
+print("Running demo_seq.py")
 import argparse
 import glob
 import itertools
@@ -43,11 +44,17 @@ from loguru import logger
 from icecream import install
 install()
 
-nltk_path_local = '/home/puhao/.cache/nltk_data'
+print("Loading demo.py dependents finished")
+# if os.environ.get('SLURM') is None:
+#     nltk_path_local = '/home/lipuhao/.cache/nltk_data'
+# else:
+#     nltk_path_local = '/home/puhao/.cache/nltk_data'
+# nltk_path_local = '/home/lipuhao/.cache/nltk_data'
+# print("nltk_path_local: ", nltk_path_local)
 
-nltk.data.path.append(nltk_path_local)
-nltk.download("popular", quiet=True, download_dir=nltk_path_local)
-nltk.download("universal_tagset", quiet=True, download_dir=nltk_path_local)
+# nltk.data.path.append(nltk_path_local)
+# nltk.download("popular", quiet=True, download_dir=nltk_path_local)
+# nltk.download("universal_tagset", quiet=True, download_dir=nltk_path_local)
 
 COCO_THING_CLASSES = [
     label
@@ -211,13 +218,13 @@ if __name__ == '__main__':
     wrapper_cfg.model = get_model_from_module(model)
 
     logger.info(args.basedir, args.part, args.clip, args.batch_size)
-    dataloader = EpicKitchen(part=args.part, clip=args.clip,
+    dataloader = EpicKitchen(basedir=args.basedir, part=args.part, clip=args.clip,
                              aug=aug).get_dataloader(batch_size=args.batch_size,
                                                      collate_fn=collate_fn_general,
-                                                     num_workers=4,
+                                                     num_workers=8,
                                                      pin_memory=True,
                                                      shuffle=False,
-                                                    )
+                                                     )
     
     inference_model = create_ddp_model(instantiate(cfg.dataloader.wrapper))
     with ExitStack() as stack:
